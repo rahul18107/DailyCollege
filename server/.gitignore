@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# Auth session files (WhatsApp session data - sensitive!)
+baileys_auth/
+
+# Cache
+message_cache.json
+
+# IDE
+.idea/
+.claude/
