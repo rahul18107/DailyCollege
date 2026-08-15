@@ -3,7 +3,7 @@ const router = express.Router()
 const { getClient, isReady } = require('../services/whatsapp')
 const { buildContext } = require('../services/context')
 const { parseWithAI } = require('../services/ai')
-const { saveCards, getCards } = require('../services/db')
+const { saveCards, getCards, updateLastProcessedTime } = require('../services/db')
 
 router.post('/', async (req, res) => {
   if (!isReady()) {
@@ -22,6 +22,18 @@ router.post('/', async (req, res) => {
     const sock = getClient()
     const context = await buildContext(sock, groupId)
 
+    if (context.textMessages.length === 0 && context.pdfs.length === 0 && context.images.length === 0) {
+      console.log('⚠️ No new messages to process')
+      const allCards = await getCards(groupId)
+      return res.json({
+        success: true,
+        newEvents: 0,
+        totalCards: allCards.length,
+        cards: allCards,
+        message: 'No new messages since last processing'
+      })
+    }
+
     console.log('Step 2: Sending to AI...')
     const events = await parseWithAI(context)
     console.log(`Step 2 done: ${events.length} total events extracted`)
@@ -29,7 +41,13 @@ router.post('/', async (req, res) => {
     console.log('Step 3: Saving to Supabase...')
     await saveCards(events, groupId)
 
-    console.log('Step 4: Fetching all cards...')
+    // Update the last processed timestamp
+    if (context.latestTimestamp) {
+      console.log(`Step 4: Updating last processed time to ${context.latestTimestamp}`)
+      await updateLastProcessedTime(groupId, context.latestTimestamp)
+    }
+
+    console.log('Step 5: Fetching all cards...')
     const allCards = await getCards(groupId)
 
     console.log('✅ Process complete\n')

@@ -72,7 +72,7 @@ async function callVisionModel(base64Image, mimetype, caption) {
   )
 
   const data = await response.json()
-  const raw = data.result?.response ?? data.result ?? ''
+  const raw = data.result?.response ?? data.result ?? []
   return parseJSON(raw)
 }
 
@@ -89,9 +89,13 @@ Each object in the array must have these exact fields:
   "new_time": "new time if rescheduled or null",
   "syllabus": "units/topics if exam or null",
   "source_msg": "the original message that triggered this",
+  "sent_by": "WhatsApp display name of who sent the source message",
   "confidence": "high" | "medium" | "low"
 }
-If there are no relevant academic events, return an empty array: []
+
+IMPORTANT: You are only processing NEW messages that haven't been analyzed before.
+Extract ONLY events from these new messages. Do not re-extract or duplicate events you may have seen previously.
+If there are no relevant academic events in these NEW messages, return an empty array: []
 Only extract events that are clearly academic — ignore personal conversations, memes, and unrelated messages.`
 }
 
@@ -159,21 +163,16 @@ function buildTextPrompt(textMessages, pinnedMsg) {
     prompt += `PINNED MESSAGE (important reference):\n${pinnedMsg}\n\n`
   }
 
-  prompt += `WHATSAPP GROUP MESSAGES:\n`
+  prompt += `WHATSAPP GROUP MESSAGES (NEW MESSAGES ONLY):\n`
   prompt += textMessages.map(m =>
-    `[${new Date(m.timestamp * 1000).toLocaleString()}] ${m.author}: ${m.body}` +
+    `[${new Date(m.timestamp * 1000).toLocaleString()}] ${m.authorName}: ${m.body}` +
     (m.quotedContent ? `\n  (replying to: "${m.quotedContent}")` : '')
   ).join('\n')
 
-  prompt += `\n\nExtract all academic events from these messages. Pay attention to:
-- Class cancellations
-- Rescheduled classes
-- Holidays (official or tentative)
-- Exam dates and syllabus
-- CIR/test dates
-- Any corrections or confirmations of previous announcements
-- If someone says "tentative" or "not confirmed" mark is_tentative as true
-- If someone later confirms a tentative event mark is_tentative as false`
+  console.log('PROMPT PREVIEW:\n', prompt.slice(0, 500))
+  console.log(`📊 Processing ${textMessages.length} new messages`)
+
+  prompt += `\n\nExtract all academic events from these NEW messages only. For sent_by use the name before the colon in each message line.`
 
   return prompt
 }
@@ -185,19 +184,20 @@ function buildPdfPrompt(pdf, pinnedMsg) {
     prompt += `PINNED MESSAGE (important reference):\n${pinnedMsg}\n\n`
   }
 
-  prompt += `PDF DOCUMENT: ${pdf.filename}\n`
+  prompt += `PDF DOCUMENT (NEW): ${pdf.filename}\n`
+  prompt += `Sent by: ${pdf.authorName}\n`
   prompt += `PDF CONTENT:\n${pdf.text}\n\n`
 
   if (pdf.surrounding.length > 0) {
     prompt += `SURROUNDING MESSAGES (sent around the same time as this PDF):\n`
     prompt += pdf.surrounding.map(m =>
-      `[${new Date(m.timestamp * 1000).toLocaleString()}] ${m.author}: ${m.body}` +
+      `[${new Date(m.timestamp * 1000).toLocaleString()}] ${m.authorName}: ${m.body}` +
       (m.quotedContent ? `\n  (replying to: "${m.quotedContent}")` : '')
     ).join('\n')
     prompt += `\n\nUse surrounding messages to determine if any PDF events are tentative or have been updated.`
   }
 
-  prompt += `\n\nExtract all academic events from this PDF — exam dates, holidays, CIR dates, syllabus.`
+  prompt += `\n\nExtract all academic events from this NEW PDF only — exam dates, holidays, CIR dates, syllabus. For sent_by use "${pdf.authorName}".`
 
   return prompt
 }

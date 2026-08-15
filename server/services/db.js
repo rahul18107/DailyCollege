@@ -54,5 +54,27 @@ async function getCards(groupId) {
 
   return data
 }
+async function getLastProcessedTime(groupId) {
+  const { data } = await supabase
+    .from('last_processed')
+    .select('last_timestamp')
+    .eq('group_id', groupId)
+    .single()
 
-module.exports = { saveCards, getCards }
+  return data?.last_timestamp || null
+}
+
+async function updateLastProcessedTime(groupId, timestamp) {
+  await supabase
+    .from('last_processed')
+    .upsert(
+      {
+        group_id: groupId,
+        last_timestamp: timestamp,
+        updated_at: new Date().toISOString()
+      },
+      { onConflict: 'group_id' }
+    )
+}
+
+module.exports = { saveCards, getCards, getLastProcessedTime, updateLastProcessedTime }

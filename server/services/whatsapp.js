@@ -99,6 +99,17 @@ async function connectToWhatsApp() {
 
   sock.ev.on('messages.upsert', ({ messages, type }) => {
     if (type === 'notify' || type === 'append') {
+      console.log(`📥 Received ${messages.length} message(s), type: ${type}`)
+      messages.forEach(msg => {
+        const content = msg.message
+        if (content?.documentMessage?.mimetype === 'application/pdf') {
+          console.log(`📄 PDF detected: ${content.documentMessage.fileName}`)
+        } else if (content?.imageMessage) {
+          console.log(`🖼️ Image detected`)
+        } else if (content?.conversation || content?.extendedTextMessage) {
+          console.log(`💬 Text message detected`)
+        }
+      })
       cacheMessages(messages)
       saveCacheToDisk()
     }
