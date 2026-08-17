@@ -90,6 +90,7 @@ Each object in the array must have these exact fields:
   "syllabus": "units/topics if exam or null",
   "source_msg": "the original message that triggered this",
   "sent_by": "WhatsApp display name of who sent the source message",
+  "quoted_msg": "the quoted/referenced message if this is a reply, or null",
   "confidence": "high" | "medium" | "low"
 }
 

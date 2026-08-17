@@ -10,6 +10,7 @@ class EventCard {
   final String? syllabus;
   final String? sourceMsg;
   final String? sentBy;
+  final String? quotedMsg;
   final String confidence;
   final DateTime generatedAt;
   final DateTime createdAt;
@@ -27,6 +28,7 @@ class EventCard {
     this.syllabus,
     this.sourceMsg,
     this.sentBy,
+    this.quotedMsg,
     required this.confidence,
     required this.generatedAt,
     required this.createdAt,
@@ -46,6 +48,7 @@ class EventCard {
       syllabus: json['syllabus'],
       sourceMsg: json['source_msg'],
       sentBy: json['sent_by'],
+      quotedMsg: json['quoted_msg'],
       confidence: json['confidence'] ?? 'high',
       generatedAt: DateTime.parse(json['generated_at']),
       createdAt: DateTime.parse(json['created_at']),
@@ -64,6 +67,7 @@ class EventCard {
         syllabus: syllabus,
         sourceMsg: sourceMsg,
         sentBy: sentBy,
+        quotedMsg: quotedMsg,
         confidence: confidence,
         generatedAt: generatedAt,
         createdAt: createdAt,

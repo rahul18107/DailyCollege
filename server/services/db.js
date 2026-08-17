@@ -24,6 +24,7 @@ async function saveCards(events, groupId) {
           syllabus: event.syllabus || null,
           source_msg: event.source_msg || null,
           sent_by: event.sent_by || null,
+          quoted_msg: event.quoted_msg || null,
           confidence: event.confidence || 'high',
           generated_at: new Date().toISOString()
         },

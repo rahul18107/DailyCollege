@@ -14,6 +14,7 @@ class AppProvider extends ChangeNotifier {
   AppStatus status = AppStatus.idle;
   String? errorMessage;
   bool serverReady = false;
+  String userName = 'Rahul'; // User name for greeting
 
   AppProvider({Map<String, String>? initialGroups}) {
     selectedGroups = initialGroups ?? {};
@@ -45,8 +46,13 @@ class AppProvider extends ChangeNotifier {
       );
       final results = await Future.wait(futures);
       cards = results.expand((l) => l).toList();
+      print('📊 Loaded ${cards.length} total cards');
+      for (var card in cards) {
+        print('  - ${card.type}: ${card.subject} on ${card.date}');
+      }
       status = AppStatus.idle;
     } catch (e) {
+      print('❌ Error loading cards: $e');
       status = AppStatus.error;
       errorMessage = 'Could not load cards. Is the server running?';
     }
@@ -77,13 +83,22 @@ class AppProvider extends ChangeNotifier {
   List<EventCard> get todayCards {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
+    final threeDaysAgo = today.subtract(const Duration(days: 3));
     final weekLater = today.add(const Duration(days: 7));
-    return cards.where((c) {
-      if (c.date == null) return false;
+
+    final filtered = cards.where((c) {
+      // Include cards with null dates (show recent events with unknown dates)
+      if (c.date == null) return true;
+
       final d = DateTime.parse(c.date!);
-      return !d.isBefore(today) && !d.isAfter(weekLater);
-    }).toList()
-      ..sort((a, b) => a.date!.compareTo(b.date!));
+      final eventDate = DateTime(d.year, d.month, d.day);
+      return !eventDate.isBefore(threeDaysAgo) && eventDate.isBefore(weekLater);
+    }).toList();
+
+    // Sort by generatedAt descending (newest first)
+    filtered.sort((a, b) => b.generatedAt.compareTo(a.generatedAt));
+
+    return filtered;
   }
 
   List<EventCard> get historyCards {

@@ -14,13 +14,13 @@ class HistoryScreen extends StatelessWidget {
     final cards = provider.historyCards;
 
     return RefreshIndicator(
-      color: const Color(0xFFF5C842),
-      backgroundColor: const Color(0xFF1A1A1A),
+      color: const Color(0xFFA84B45),
+      backgroundColor: const Color(0xFFF2EDE3),
       onRefresh: () => context.read<AppProvider>().refresh(),
       child: CustomScrollView(
       slivers: [
         SliverAppBar(
-          backgroundColor: const Color(0xFF111111),
+          backgroundColor: const Color(0xFFF2EDE3),
           floating: true,
           pinned: false,
           title: Column(
@@ -31,7 +31,7 @@ class HistoryScreen extends StatelessWidget {
                 style: GoogleFonts.spaceGrotesk(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                  color: Colors.black,
                 ),
               ),
               if (provider.selectedGroups.isNotEmpty)
@@ -39,7 +39,7 @@ class HistoryScreen extends StatelessWidget {
                   provider.selectedGroups.values.join(', '),
                   style: GoogleFonts.dmSans(
                     fontSize: 13,
-                    color: Colors.white38,
+                    color: Colors.black38,
                   ),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
@@ -86,37 +86,43 @@ class HistoryScreen extends StatelessWidget {
             ),
           )
         else
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                final card = cards[index];
-                final showDateHeader = index == 0 ||
-                    !_sameDay(
-                      cards[index - 1].generatedAt,
-                      card.generatedAt,
-                    );
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                  final card = cards[index];
+                  final showDateHeader = index == 0 ||
+                      !_sameDay(
+                        cards[index - 1].generatedAt,
+                        card.generatedAt,
+                      );
 
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (showDateHeader)
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 4),
-                        child: Text(
-                          DateFormat('EEEE, d MMM').format(card.generatedAt),
-                          style: GoogleFonts.dmSans(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white24,
-                            letterSpacing: 0.8,
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (showDateHeader)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(4, 24, 4, 12),
+                          child: Text(
+                            DateFormat('EEEE, d MMM').format(card.generatedAt).toUpperCase(),
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                              letterSpacing: 1.2,
+                            ),
                           ),
                         ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: EventCardWidget(card: card),
                       ),
-                    EventCardWidget(card: card),
-                  ],
-                );
-              },
-              childCount: cards.length,
+                    ],
+                  );
+                },
+                childCount: cards.length,
+              ),
             ),
           ),
 

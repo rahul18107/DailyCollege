@@ -36,7 +36,7 @@ class _HomeShellState extends State<HomeShell> {
     final provider = context.watch<AppProvider>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFF111111),
+      backgroundColor: const Color(0xFFF2EDE3),
       body: Stack(
         children: [
           Column(
@@ -66,7 +66,7 @@ class _HomeShellState extends State<HomeShell> {
 
           // Floating nav bar
             Positioned(
-            bottom: 40,
+            bottom: 60,
                   left: 100,
                   right: 100,
                   child: ClipRRect(
@@ -76,10 +76,10 @@ class _HomeShellState extends State<HomeShell> {
                   filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                   child: Container(
                   decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.01),
+                  color: Colors.black12.withValues(alpha: 0.01),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                  color: Colors.white.withOpacity(0.11),
+                  color: Colors.white.withValues(alpha: 0.11),
                   width: 0.8,
                   ),
                   ),
@@ -141,7 +141,7 @@ class _NavItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
 
         decoration: BoxDecoration(
-          color: selected ? Colors.black12.withOpacity(0.75) : Colors.white.withOpacity(0.2),
+          color: selected ? Colors.black12.withValues(alpha: 0.75) : Colors.white.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(100),
         ),
         child: Icon(
@@ -164,15 +164,15 @@ class _GroupsTab extends StatelessWidget {
     return CustomScrollView(
       slivers: [
         SliverAppBar(
-          backgroundColor: const Color(0xFF111111),
+          backgroundColor: const Color(0xFFF2EDE3),
           floating: true,
           pinned: false,
           title: Text(
             'Groups',
-            style: GoogleFonts.spaceGrotesk(
+            style: GoogleFonts.inter(
               fontSize: 24,
               fontWeight: FontWeight.w700,
-              color: Colors.white,
+              color: Colors.black,
             ),
           ),
         ),
@@ -185,21 +185,21 @@ class _GroupsTab extends StatelessWidget {
                   margin: const EdgeInsets.only(bottom: 12),
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1A1A1A),
+                    color: const Color(0xFFF2EDE3),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFFF5C842), width: 1.5),
+                    border: Border.all(color: const Color(0xFFA84B45), width: 1.5),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.check_circle, size: 18, color: Color(0xFFF5C842)),
+                      const Icon(Icons.check_circle, size: 18, color: Color(0xFFA84B45)),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
                           e.value,
-                          style: GoogleFonts.spaceGrotesk(
+                          style: GoogleFonts.inter(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: Colors.black,
                           ),
                         ),
                       ),
@@ -221,16 +221,16 @@ class _GroupsTab extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF5C842),
+                    color: Colors.black,
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: Text(
                     'Change Groups',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.dmSans(
+                    style: GoogleFonts.inter(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: Colors.black,
+                      color: Colors.white,
                     ),
                   ),
                 ),
