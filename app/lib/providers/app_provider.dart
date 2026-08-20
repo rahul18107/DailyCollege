@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/event_card.dart';
+
 import '../services/api_service.dart';
 
 enum AppStatus { idle, loading, refreshing, error }
@@ -14,7 +15,7 @@ class AppProvider extends ChangeNotifier {
   AppStatus status = AppStatus.idle;
   String? errorMessage;
   bool serverReady = false;
-  String userName = 'Rahul'; // User name for greeting
+  String userName = 'User'; // User name for greeting
 
   AppProvider({Map<String, String>? initialGroups}) {
     selectedGroups = initialGroups ?? {};
@@ -22,6 +23,32 @@ class AppProvider extends ChangeNotifier {
 
   Future<void> checkServer() async {
     serverReady = await _api.checkStatus();
+    notifyListeners();
+  }
+
+  Future<void> getUserName() async {
+    String? name;
+    for (int i = 0; i < 5; i++) {
+      name = await _api.getConnectedUserName();
+      if (name != null) break;
+      await Future.delayed(const Duration(seconds: 2));
+    }
+    if (name != null) {
+      userName = name;
+      notifyListeners();
+    }
+  }
+
+  // Add logout:
+  Future<void> logout() async {
+    await _api.logout();
+    cards = [];
+    selectedGroups = {};
+    userName = 'User';
+    serverReady = false;
+    status = AppStatus.idle;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('selected_groups');
     notifyListeners();
   }
 

@@ -5,16 +5,16 @@ const supabase = createClient(
   process.env.SUPABASE_KEY
 )
 
-async function saveCards(events, groupId) {
+async function saveCards(events, groupId, userPhone) {
   if (!events || events.length === 0) return
 
   for (const event of events) {
-    // dedup — if same group + type + subject + date exists, update it
     const { error } = await supabase
       .from('event_cards')
       .upsert(
         {
           group_id: groupId,
+          user_phone: userPhone,  // ← add
           type: event.type,
           subject: event.subject,
           date: event.date,
@@ -28,53 +28,51 @@ async function saveCards(events, groupId) {
           confidence: event.confidence || 'high',
           generated_at: new Date().toISOString()
         },
-        {
-          onConflict: 'group_id, type, subject, date'
-        }
+        { onConflict: 'group_id, type, subject, date, user_phone' }  // ← add
       )
 
-    if (error) {
-      console.error('Supabase upsert error:', error.message)
-    }
+    if (error) console.error('Supabase upsert error:', error.message)
   }
-
   console.log(`✅ Saved ${events.length} events to Supabase`)
 }
 
-async function getCards(groupId) {
+async function getCards(groupId, userPhone) {
   const { data, error } = await supabase
     .from('event_cards')
     .select('*')
     .eq('group_id', groupId)
+    .eq('user_phone', userPhone)  // ← add
     .order('date', { ascending: true })
 
   if (error) {
     console.error('Supabase fetch error:', error.message)
     return []
   }
-
   return data
 }
-async function getLastProcessedTime(groupId) {
+
+async function getLastProcessedTime(groupId, userPhone) {
   const { data } = await supabase
     .from('last_processed')
     .select('last_timestamp')
     .eq('group_id', groupId)
+    .eq('user_phone', userPhone)  // ← add
     .single()
 
   return data?.last_timestamp || null
 }
 
-async function updateLastProcessedTime(groupId, timestamp) {
+async function updateLastProcessedTime(groupId, timestamp, userPhone) {
   await supabase
     .from('last_processed')
     .upsert(
       {
         group_id: groupId,
+        user_phone: userPhone,  // ← add
         last_timestamp: timestamp,
         updated_at: new Date().toISOString()
       },
-      { onConflict: 'group_id' }
+      { onConflict: 'group_id, user_phone' }  // ← add
     )
 }
 

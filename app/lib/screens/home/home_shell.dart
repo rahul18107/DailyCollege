@@ -26,7 +26,10 @@ class _HomeShellState extends State<HomeShell> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+
+      await context.read<AppProvider>().checkServer();
+      await context.read<AppProvider>().getUserName();
       context.read<AppProvider>().loadCards();
     });
   }
@@ -41,8 +44,9 @@ class _HomeShellState extends State<HomeShell> {
         children: [
           Column(
             children: [
+
               // Server offline banner
-              if (!provider.serverReady)
+              if (  !provider.serverReady)
                 Container(
                   width: double.infinity,
                   color: const Color(0xFFFF6B6B),

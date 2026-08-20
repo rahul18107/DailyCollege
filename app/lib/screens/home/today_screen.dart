@@ -5,9 +5,11 @@ import 'package:provider/provider.dart';
 import '../../providers/app_provider.dart';
 import '../../models/event_card.dart';
 import '../../widgets/event_card_widget.dart';
+import '../../main.dart';
 
 class TodayScreen extends StatelessWidget {
   const TodayScreen({super.key});
+
 
   Widget _cardWidget(EventCard card) {
     if (card.type == 'cancellation') return CancellationCardWidget(card: card);
@@ -22,11 +24,14 @@ class TodayScreen extends StatelessWidget {
     )).toList();
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<AppProvider>();
     final cards = provider.todayCards;
     final now = DateTime.now();
+
 
     return RefreshIndicator(
       color: const Color(0xFFA84B45),
@@ -41,6 +46,7 @@ class TodayScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const SizedBox(height:10),
                 Row(
                   children: [
                     Expanded(
@@ -80,10 +86,88 @@ class TodayScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    CircleAvatar(
-                      radius: 24,
-                      backgroundColor: Color(0xFFF2EDE3),
-                      child: Icon(Icons.person, color: Colors.grey.shade600, size: 28),
+                    GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          backgroundColor: const Color(0xFFF2EDE3),
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                          ),
+                          builder: (_) {
+                            return Padding(
+                              padding: const EdgeInsets.fromLTRB(24, 16, 24, 40),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 40, height: 4,
+                                    decoration: BoxDecoration(
+                                      color: Colors.black26,
+                                      borderRadius: BorderRadius.circular(2),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 24),
+                                  CircleAvatar(
+                                    radius: 32,
+                                    backgroundColor: Colors.black12,
+                                    child: Icon(Icons.person, color: Colors.grey.shade600, size: 36),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    provider.userName,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'WhatsApp connected',
+                                    style: GoogleFonts.inter(fontSize: 13, color: Colors.black45),
+                                  ),
+                                  const SizedBox(height: 32),
+                                  GestureDetector(
+                                    onTap: () async {
+                                      Navigator.pop(context);
+                                      await context.read<AppProvider>().logout();
+                                      if (context.mounted) {
+                                        Navigator.of(context).pushAndRemoveUntil(
+                                          MaterialPageRoute(builder: (_) => const AppGate()),
+                                              (_) => false,
+                                        );
+                                      }
+                                    },
+                                    child: Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.symmetric(vertical: 14),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red.shade900,
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                      child: Text(
+                                        'Logout',
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.inter(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      child: CircleAvatar(
+                        radius: 24,
+                        backgroundColor: const Color(0xFFF2EDE3),
+                        child: Icon(Icons.person, color: Colors.grey.shade600, size: 28),
+                      ),
                     ),
                   ],
                 ),
@@ -117,8 +201,8 @@ class TodayScreen extends StatelessWidget {
                           DateFormat('MMMM').format(now).toUpperCase(),
                           style: GoogleFonts.inter(
                             fontSize: 40,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
                             letterSpacing: 0.5,
                           ),
                         ),

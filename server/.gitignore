@@ -8,7 +8,7 @@ node_modules/
 baileys_auth/
 
 # Cache
-message_cache.json
+message_cache*.json
 
 # IDE
 .idea/

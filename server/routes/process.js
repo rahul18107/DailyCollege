@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { getClient, isReady } = require('../services/whatsapp')
+const { getClient, isReady ,getConnectedUser} = require('../services/whatsapp')
 const { buildContext } = require('../services/context')
 const { parseWithAI } = require('../services/ai')
 const { saveCards, getCards, updateLastProcessedTime } = require('../services/db')
@@ -10,6 +10,7 @@ router.post('/', async (req, res) => {
     return res.status(503).json({ error: 'WhatsApp not ready yet' })
   }
 
+
   const { groupId } = req.body
   if (!groupId) {
     return res.status(400).json({ error: 'groupId is required' })
@@ -17,6 +18,9 @@ router.post('/', async (req, res) => {
 
   try {
     console.log('\n🚀 Process started for group:', groupId)
+
+    const user = getConnectedUser()
+    const userPhone = user?.id?.split(':')[0] || 'default'
 
     console.log('Step 1: Building context...')
     const sock = getClient()
@@ -32,6 +36,8 @@ router.post('/', async (req, res) => {
         cards: allCards,
         message: 'No new messages since last processing'
       })
+
+
     }
 
     console.log('Step 2: Sending to AI...')
@@ -39,16 +45,16 @@ router.post('/', async (req, res) => {
     console.log(`Step 2 done: ${events.length} total events extracted`)
 
     console.log('Step 3: Saving to Supabase...')
-    await saveCards(events, groupId)
+    await saveCards(events, groupId, userPhone)
 
     // Update the last processed timestamp
     if (context.latestTimestamp) {
       console.log(`Step 4: Updating last processed time to ${context.latestTimestamp}`)
-      await updateLastProcessedTime(groupId, context.latestTimestamp)
+      await updateLastProcessedTime(groupId, context.latestTimestamp,userPhone)
     }
 
     console.log('Step 5: Fetching all cards...')
-    const allCards = await getCards(groupId)
+    const allCards = await getCards(groupId,userPhone)
 
     console.log('✅ Process complete\n')
     res.json({

@@ -147,6 +147,7 @@ class EventCardWidget extends StatelessWidget {
                       card.sentBy!,
                       style: GoogleFonts.inter(
                         fontSize: 12,
+                        fontWeight: FontWeight.bold,
                         color: Colors.white60,
                       ),
                     ),
