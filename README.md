@@ -1,7 +1,7 @@
 
 #  DailyCollege
 
-> Turn your college WhatsApp chaos into clean, AI-generated event cards — delivered daily.
+**Turn your college WhatsApp chaos into clean, AI-generated event cards — delivered daily.**
 
 ## 🖼️ Overview
 
