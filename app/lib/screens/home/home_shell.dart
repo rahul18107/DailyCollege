@@ -80,7 +80,7 @@ class _HomeShellState extends State<HomeShell> {
                   filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                   child: Container(
                   decoration: BoxDecoration(
-                  color: Colors.black12.withValues(alpha: 0.01),
+                  color: Colors.black12.withValues(alpha: 0.09),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                   color: Colors.white.withValues(alpha: 0.11),
