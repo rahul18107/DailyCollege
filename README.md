@@ -5,7 +5,7 @@
 
 ##  Overview
 
-![DailyCollege Demo](./assets/demo.gif)
+![DailyCollege Demo](./assets/demo.png)
 
 ##  Features
 
